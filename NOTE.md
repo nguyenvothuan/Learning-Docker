@@ -3,6 +3,7 @@
 ## Chapter 2: Course Introduction
 ## Chapter 3: Setup Docker
 ## Chapter 4: Containers
+### The Basics
 1. Docker command format:  
 - New "management commands" format: `docker <command> <sub-command> (options)`
 - Old way (still works): docker `docker <command> (options)`
@@ -30,10 +31,39 @@
 9. `docker top <container_id>`: return a snapshot of running processes in a container
 10. `docker container inspect <container_name>`
 11. `docker container stats`
-12. `docker container run -it <container_name> bash`
+12. `docker container run -it <image_name> bash`
 - `-it`: flag to be interactive
 - `bash`: enter container's bash, type 'exit' to exit. Only works if continaer has a bash :)
 13. `docker pull <image_name>`
 14. `docker image ls`
-15. `docker container run -it <container_name>`: start new container interactively
+15. `docker container run -it <image_name>`: start new container interactively
 16. `docker container exec -it <container_name> `: run additional command in existing container
+
+### Networking in Docker
+- `--format "{{ WantedFieldsInGo}}"`: return in the wanted format
+    - e.g: `docker container inspect --format "{{.NetworkSettings.IPAddress}}" webhost`
+- `docker container port webhost <container_name>`: quick port check
+- Each container connected to a private virtual network call "bridge"
+- Each virtual network routes through NAT firewall on host IP
+- All containers on a virtual network can talk to each other with `-p` flag
+- Best practice would be to create a new virtual network for each app 
+- `docker network create --driver [bridge | host | overlay] <network_name>`: create a new virtual network with a specific driver
+- `docker network connect [OPTIONS] <network_name> <container_name>`: connect a container to a network. If the container is already in a network, it will be connected to both networks. 
+- `docker container run -d --net <network_name> --net-alias <network_alias_name> --name <container_name> <image_name>`: run a container in a specific network with an alias name. The alias name can be used by other containers IN THE NETWORK to connect to this container, instead of using full IP or container name.
+
+## Chapter 5: Images
+- App binaries and dependencies
+- Metadata about the image data and how to run the image
+- Official definition: An image is an ordered collection of root filesystem changes and the corresponding execution parameters for use within a container runtime
+- Not a complete OS. No kernel, kernel modules (e.g drivers)
+- Small as one file (your app binary) like a golang static binary
+- Big as a Ubuntu distro with apt, Apache, PHP, and more installed
+ ### Image Layers
+- Images are made up of file system changes and metadata
+- Each layer is a set of filesystem changes
+- `docker image history <image_name>`: show the layers of an image, aka, the changes made to the image
+- `docker image inspect <image_name>`: show the metadata of an image. Stuff like: exposed ports, environment variables, etc.
+- `docker image tag SOURCE_IMAGE[:TAG] TARGET_IMAGE[:TAG]`: create a tag TARGET_IMAGE that refers to SOURCE_IMAGE. 
+- What tagging does? It's like a pointer to an image. If you tag an image with a new tag, you can use that tag to refer to the image. An image can have multiple tags. If no `[:TAG]` is provided, it will default to `latest` 
+- `cat .docker/config.json`: show the docker config file. This file stores the credentials for Docker Hub.
+- `docker login/logout`: login/logout to Docker Hub
