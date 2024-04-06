@@ -58,7 +58,7 @@
 - Not a complete OS. No kernel, kernel modules (e.g drivers)
 - Small as one file (your app binary) like a golang static binary
 - Big as a Ubuntu distro with apt, Apache, PHP, and more installed
- ### Image Layers
+### Image Layers
 - Images are made up of file system changes and metadata
 - Each layer is a set of filesystem changes
 - `docker image history <image_name>`: show the layers of an image, aka, the changes made to the image
@@ -67,3 +67,18 @@
 - What tagging does? It's like a pointer to an image. If you tag an image with a new tag, you can use that tag to refer to the image. An image can have multiple tags. If no `[:TAG]` is provided, it will default to `latest` 
 - `cat .docker/config.json`: show the docker config file. This file stores the credentials for Docker Hub.
 - `docker login/logout`: login/logout to Docker Hub
+
+### Dockerfile
+- 5 stanzas in a Dockerfile:
+    - `FROM`: what image you want to base your image off of. E.g: `FROM nginx:latest`
+    - `ENV`: environment variables. E.g: `ENV NGINX_VERSION=1.13.12-1~jessie`
+    - `RUN`: run a command. E.g: `RUN apt-get update && apt-get install -y nginx`
+    - `EXPOSE`: expose a port. E.g: `EXPOSE 80 443`
+    - `CMD`: the command to run when the container starts. E.g: `CMD ["nginx", "-g", "daemon off;"]`. The `CMD` is a required parameter that is the final command that will be run when the container starts. If you want to run multiple commands, you can use `ENTRYPOINT` instead.
+- `docker image build -t <image_name> .`: build an image from a Dockerfile. The `.` is the context of the build. It's the path where the Dockerfile is located.
+- use `WORKDIR` to set the working directory for the `RUN` command. E.g: `WORKDIR /usr/share/nginx/html`. 
+- `FROM` copies all layers from the base image to the new image. The `RUN` command creates a new layer on top of the base image.
+- `--file` flag to specify the Dockerfile location. E.g: `docker image build -t <image_name> --file <Dockerfile_location> .`
+- `docker image prune`: remove dangling images. Dangline images are images that are not tagged and not used by any container.
+- `docker system prune`: remove all unused images, containers, networks, and volumes
+- `docker system df` to see space usage
