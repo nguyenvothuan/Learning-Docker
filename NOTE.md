@@ -82,3 +82,18 @@
 - `docker image prune`: remove dangling images. Dangline images are images that are not tagged and not used by any container.
 - `docker system prune`: remove all unused images, containers, networks, and volumes
 - `docker system df` to see space usage
+
+## Chapter 6: Volumes
+- Containers are usually immutable and ephemeral
+- "Immutable infrastructure": only re-deploy containers, never change
+- This is the ideal scenario, but what about databases, or unique data?
+- Docker gives us features to ensure these "separation of concerns". This is known as "persistent data".
+- Two solutions: Volumes and Bind Mounts
+- Volumes: make special location outside of container UFS. 
+- Bind Mounts: link container path to host path. 
+### Volumes
+- `docker volume ls`: list all volumes
+- `docker container run -d --name <container_name> -v <volume_name>:<container_path> <image_name>`: create a volume and mount it to a container. If the volume doesn't exist, it will be created. If the volume exists, it will be mounted to the container. 
+### Bind Mounting
+- `docker container run -d --name <container_name> -v <host_path>:<container_path> <image_name>`: bind mount a host path to a container path. If the host path doesn't exist, it will be created. If the host path exists, it will be mounted to the container. Everything in the `<host_path>` becomes shared between the host and the container.
+- `$(pwd)`: print the current working directory
