@@ -95,5 +95,18 @@
 - `docker volume ls`: list all volumes
 - `docker container run -d --name <container_name> -v <volume_name>:<container_path> <image_name>`: create a volume and mount it to a container. If the volume doesn't exist, it will be created. If the volume exists, it will be mounted to the container. 
 ### Bind Mounting
-- `docker container run -d --name <container_name> -v <host_path>:<container_path> <image_name>`: bind mount a host path to a container path. If the host path doesn't exist, it will be created. If the host path exists, it will be mounted to the container. Everything in the `<host_path>` becomes shared between the host and the container.
+- `docker container run -d --name <container_name> -v <host_path>:<container_path> <image_name>`: bind mount a host path to a container path. If the host path doesn't exist, it will be created. If the host path exists, it will be mounted to the container. Everything in the `<host_path>` becomes shared between the host and the container. So, the container will automatically detect changes in the shared directory and reflect them.
 - `$(pwd)`: print the current working directory
+
+## Chapter 7: Docker Compose
+### Why
+- Configure relationships between containers
+- Save our docker container run settings in easy-to-read file
+- Create one-liner developer environment startups
+### docker-compose.yml
+- `version`: version of the compose file format
+- `docker compose -f`: specify the compose file, default is `docker-compose.yml`
+- `docker compose down --rmi local`: Tell Docker to remove images as well. By default, Docker Compose will only remove the containers and networks.
+- `docker compose up -d`: start the containers in the background
+- `docker compose up --build`: build the images before starting the containers. 
+- A bridge network is created by default for all containers in the same compose file.
