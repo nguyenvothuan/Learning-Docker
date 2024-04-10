@@ -1,4 +1,5 @@
 # Docker
+Note taking from this Docker course: https://www.udemy.com/course/docker-mastery/
 ## Chapter 1: Quick Start
 ## Chapter 2: Course Introduction
 ## Chapter 3: Setup Docker
@@ -132,7 +133,11 @@
     - Docker changes the working mode of Docker Engine on the machine to swarm mode
     - Current machine becomes a manager node. In a Docker Swarm cluster, manager nodes are responsible for maintaining the cluster state, scehduling services, and serving swarm mode HTTP API endpoints.
     - Docker generates a manager secret and a worker secret. These secrets are used to add additional manager and worker nodes to the swarm.
-    - Docker sets up a networking for the swarm, including creating a default overlay network for internal cmmunication betwween services.
+    - Docker sets up a networking for the swarm, including creating a default **overlay** network for internal cmmunication betwween services.
+- Quick recap: Three types of Docker network:
+    - **Bridge**: default network when you create a container. It's a private internal network created by Docker on the host. Containers can talk to each other on this network.
+    - **Host**: removes network isolation between the container and the Docker host. The container uses the host's network directly.
+    - **Overlay**: multi-host network. It's used when you want to create a network that spans multiple Docker hosts. This is useful when you have a multi-node Docker Swarm cluster and you want to create a network that spans all the nodes in the cluster.
 - `docker service create [OPTIONS] IMAGE [COMMAND] [ARG...]`: create a service from an image. A service is a definition of a task that should be run on the swarm. It's a way to scale containers across multiple Docker daemons.
 - `docker node ls`: list all nodes in the swarm
 - `docker service ps <service_name>`: list all tasks of a service
@@ -151,3 +156,6 @@
 - `docker swarm join-token <worker|manager>`: get the join token for a worker or a manager. This is useful when you want to add a new node to the swarm.
 - `docker node update --role <manager|worker> <name of node>`: update the role of a node in the swarm. This is useful when you want to change the role of a node from a manager to a worker or vice versa.
 - So after we have created a Swarm and added nodes to it, on the leader node, we can create services. Depend on the replicas we set for that service, Swarm will use its load-balancing strategy to distribute the tasks of that service to the worker nodes. 
+- `sudo chmod 666 /var/run/docker.sock`: give permission to the Docker socket. This is useful when you want to run Docker commands without using `sudo`.
+
+## Chapter 9: Swarm Basic Features
