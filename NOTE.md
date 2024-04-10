@@ -110,3 +110,44 @@
 - `docker compose up -d`: start the containers in the background
 - `docker compose up --build`: build the images before starting the containers. 
 - A bridge network is created by default for all containers in the same compose file.
+
+## Chapter 8: Swarm
+- Containers everywhere, how to manage them?
+- How do we automate container lifecycle?
+- How do we scale them up and down?
+- How can we ensure containers are re-created if they fail?
+- How can we replace containers without downtime?
+- How can we control/track where containers are started?
+- How can we create cross-node virtual networks?
+- How can we ensure only trusted servers run our containers?
+- How can we store secrets, keys, passwords, and get them to the right container?
+### Swarm and Swarm Node
+- A node refers to an instance of the Docker engine participating in the swarm. A swarm is a group of machines that are running Docker and joined into a cluster. Once a group of machines have been joined together, you can still run the Docker commands that you're used to, but they are now executed on a cluster by a swarm manager. The machines in a swarm can be physical or virtual. After joining a swarm, they are referred to as nodes.
+- Two types of nodes:
+    - Manager nodes: Manager nodes handle orchestration and cluster management functions of Swarm. They perform the key functions of maintaining the desired state, scheduling services, and serving the swarm mode HTTP API endpoints. You can also run workloads on manager nodes, but it's generally recommended to leave manager nodes for management duties.
+    - Worker nodes: Worker nodes are there to provide capacity to your applications. Worker nodes receive and execute tasks dispatched from manager nodes. 
+- RAFT: Consensus algorithm used by Swarm to manage the cluster state. It's a protocol that allows a collection of machines to work as a coherent group that can survive the failures of some of its members.
+### Services
+- `docker swarm init`: initialize a swarm. Doing that on a local machine create a Docker Swarm single-node cluster and the machine becomes the manager node of that cluster. Breakdown:
+    - Docker changes the working mode of Docker Engine on the machine to swarm mode
+    - Current machine becomes a manager node. In a Docker Swarm cluster, manager nodes are responsible for maintaining the cluster state, scehduling services, and serving swarm mode HTTP API endpoints.
+    - Docker generates a manager secret and a worker secret. These secrets are used to add additional manager and worker nodes to the swarm.
+    - Docker sets up a networking for the swarm, including creating a default overlay network for internal cmmunication betwween services.
+- `docker service create [OPTIONS] IMAGE [COMMAND] [ARG...]`: create a service from an image. A service is a definition of a task that should be run on the swarm. It's a way to scale containers across multiple Docker daemons.
+- `docker node ls`: list all nodes in the swarm
+- `docker service ps <service_name>`: list all tasks of a service
+- A service can have multiple replicas. A replica is a task that runs on a worker node. The number of replicas is the number of tasks that should be running for a service.
+- `docker service update <service_id> --replicas <number_of_replicas>`: update the number of replicas for a service. 
+- A little about task. A task is the atomic scheduling unit of Swarm. It's a running container which is part of a service. A task is assigned to a node by the manager, and it stays on that node until the task is removed or the node fails.
+- Swarm will quickly replace a failed task with a new recreacted task. 
+- Multipass: a tool to create and manage virtual machines. It's a lightweight VM manager for Linux, Windows, and macOS. It's a good tool to create a multi-node Docker Swarm cluster on a single machine.
+- `multipass launch --name <node_name> --cpus <number_of_cpus> --mem <memory_size> --disk <disk_size>`: create a new virtual machine with the specified name, CPUs, memory size, and disk size.
+- `multipass shell <node_name>`: open a shell to the virtual machine.
+- `multipass exec <node_name> -- <command>`: run a command in the virtual machine.
+- E.g: `multipass exec node1 -- env`: run `env` command in the virtual machine `node1`
+- To get docker on VM: `curl -sSL https://get.docker.com | sh`
+- `docker swarm init --advertise-addr <node_IP>`: initialize a swarm with the specified IP address. This is useful when you have multiple network interfaces on the machine and you want to specify which interface to use for the swarm. Of course, a Docker container or a virtual machine will have its own virtual network interface, along (possibly) with a virtual network interface for the VM to communicate with the host machine. 
+- `docker swarm join --token <token> <manager_IP>:<manager_port>`: join a node to a swarm. This is useful when you have multiple nodes and you want to add them to the swarm. The token is generated when you initialize the swarm or using the below command.
+- `docker swarm join-token <worker|manager>`: get the join token for a worker or a manager. This is useful when you want to add a new node to the swarm.
+- `docker node update --role <manager|worker> <name of node>`: update the role of a node in the swarm. This is useful when you want to change the role of a node from a manager to a worker or vice versa.
+- So after we have created a Swarm and added nodes to it, on the leader node, we can create services. Depend on the replicas we set for that service, Swarm will use its load-balancing strategy to distribute the tasks of that service to the worker nodes. 
