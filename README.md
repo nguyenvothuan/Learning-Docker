@@ -161,3 +161,9 @@ Note taking from this Docker course: https://www.udemy.com/course/docker-mastery
 - `sudo chmod 666 /var/run/docker.sock`: give permission to the Docker socket. This is useful when you want to run Docker commands without using `sudo`.
 
 ## Chapter 9: Swarm Basic Features
+### Routing Mesh Cont
+- Routing Mesh: automatically routes incoming requests to published ports on available nodes in the cluster. It makes sure that the request is routed to a node that has a task for the service. For example, if a node is running a Drupal task, you can access the IP:port of the Drupal service on that node. 
+- Stateless load balancing. Nginx or HAProxy LB may come to help
+- Docker Swarm Routing Mesh provides Layer 4 (transport layer) load balancing. 
+- Accessing a service on a Swarm cluster: `http://<node_IP>:<published_port>`. The request will be routed to the node that has the task for the service, so it doesn't matter which node you access.
+- **Decentralized**: each node in the Swarm handles routing of the incoming requests automously. Should the node becomes oveloaded, it will not accept new connections but transfer these connections to other available nodes in the overlay network.
