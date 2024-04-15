@@ -167,3 +167,46 @@ Note taking from this Docker course: https://www.udemy.com/course/docker-mastery
 - Docker Swarm Routing Mesh provides Layer 4 (transport layer) load balancing. 
 - Accessing a service on a Swarm cluster: `http://<node_IP>:<published_port>`. The request will be routed to the node that has the task for the service, so it doesn't matter which node you access.
 - **Decentralized**: each node in the Swarm handles routing of the incoming requests automously. Should the node becomes oveloaded, it will not accept new connections but transfer these connections to other available nodes in the overlay network.
+- Ingress network: the network that the routing mesh uses to route incoming requests to the services in the cluster. The ingress network is an overlay network that is created by Docker when you initialize a Swarm. The ingress network is used by the routing mesh to route incoming requests to the services in the cluster.
+### Stacks: Production Grade Compose
+- In 1.13, Docker adds a new layer of abstraction to Swarm called Stacks
+- Stacks are a way to define and run multi-container applications on Swarm.
+- Stacks accept Compose files as their declarative definition for services, networks, and volumes. Key `deploy` in each service is ignored whenever runned on local machine instead of Swarm mode.
+- `docker stack deploy -c <compose_file> <stack_name>`: deploy a stack to the Swarm. The compose file is the file that defines the services, networks, and volumes for the stack. The stack name is the name of the stack.
+- `docker stack services <stack_name>`: list all services in a stack
+- `docker stack ps <stack_name>`: list all tasks in a stack
+- Understandably, it is just a way to deploy services to the Swarm, but more convenient than using `docker service create` command.
+### Secrets Storage
+- Easiest secure solution for storing secrets in Swarm
+- Swarm Raft DB is encrypted on disk, and stored on disk on Manager nodes
+- Secretes are first stored in Swarm, then assigned to Services
+- Secrets look like files in container but are actually in-memory fs
+- `docker secret create <secret_name> <file>`: create a secret from a file. The secret name is the name of the secret. The file is the file that contains the secret data.
+- `docker service create --secret <secret_name> --name <service_name> <image_name>`: create a service with a secret. The secret name is the name of the secret. The service name is the name of the service. The image name is the name of the image.
+- `echo "password" | docker secret create psql_pass -`: create a secret from a string. The secret name is `psql_pass` and the secret data is `password`. The `-` at the end of the command tells Docker to read the secret data from the *standard input*.
+- ` docker service create --name psql --secret psql_user --secret psql_pass -e POSTGRESS_PASSWORD_FILE=/run/secrets/psql_pass -e POSTGRES_USER_FILE=/run/secrets/psql_user postgres`: If you know you know
+- `docker exec -it <container_name> bash`: enter a container's shell\
+
+### Secrets in Stacks
+```yaml
+version: '3.1' # must be 3.1 to have secret support
+services:
+  db:
+    image: postgres
+    secrets: # list of secrets for service db
+      - psql_user
+      - psql_pass
+    environment:
+      POSTGRES_PASSWORD_FILE: /run/secrets/psql_pass #use these secrets sepcified above
+      POSTGRES_USER_FILE: /run/secrets/psql_user
+
+secrets:
+# secret_key:
+#   file: ./path/to/secret.txt 
+#   OR 
+#   external: true if secrets exposed via echo in the cmd
+  psql_user:
+    file: ./psql_user.txt
+  psql_pass:
+    file: ./psql_pass.txt
+```
