@@ -210,3 +210,16 @@ secrets:
   psql_pass:
     file: ./psql_pass.txt
 ```
+## Chapter 10: Swarm App Lifecycle
+- `docker-compose.override.yml`, `docker-compose.prod.yml`, `docker-compose.test.yml`, `docker-compose.yml`:
+  - `docker-compose.yml`: the base file
+  - `docker-compose.override.yml`: used to override the configs in the base `docker-compose.yml` file for dev environment. Docker Compose automatically reads both `docker-compose.yml` and `docker-compose.override.yml` files if they ae present in the same directory and no `-f` flag is specified. 
+  - `docker-compose.prod.yml`: used to override the configs in the base `docker-compose.yml` file for the production environment. It might include configs for different logging levels, replication, resource limits, etc... that are specific to the production environment.
+  - `docker-compose.test.yml`
+  - To use override files other than the `docker-compose.override.yml`, you can use the `-f` flag. E.g: `docker-compose -f docker-compose.yml -f docker-compose.prod.yml up -d`
+### Rolling Updates
+- `docker service update --image <new_image> <service_name>`: update the image of a service. This will create a new task with the new image and remove the old task with the old image. 
+- `docker service update --env-add <ENV_NAME>=<ENV_VALUE> --publish-rm <PORT> <service_name>`: add an environment variable to a service and remove a published port from the service.
+- `docker service scale <service_name>=<number_of_replicas>[]`: scale a service to the specified number of replicas. 
+- After some updates, do `docker service update --force web` to rebalance the tasks across the service.
+### Healthchecks
