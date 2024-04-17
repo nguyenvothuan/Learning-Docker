@@ -223,3 +223,4 @@ secrets:
 - `docker service scale <service_name>=<number_of_replicas>[]`: scale a service to the specified number of replicas. 
 - After some updates, do `docker service update --force web` to rebalance the tasks across the service.
 ### Healthchecks
+
