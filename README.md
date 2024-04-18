@@ -85,7 +85,7 @@ Note taking from this Docker course: https://www.udemy.com/course/docker-mastery
 - `docker image prune`: remove dangling images. Dangline images are images that are not tagged and not used by any container.
 - `docker system prune`: remove all unused images, containers, networks, and volumes
 - `docker system df` to see space usage
-
+- `FROM some_image:some_version as build`: create a temporary image with a name. This is useful when you want to build an image and copy the build artifacts to another image. E.g we may need npm and node to run react app, but we don't need them in the final image. So we can create a temporary image with npm and node, build the react app, then copy the build artifacts to the final image.
 ## Chapter 6: Volumes
 - Containers are usually immutable and ephemeral
 - "Immutable infrastructure": only re-deploy containers, never change
@@ -224,3 +224,14 @@ secrets:
 - After some updates, do `docker service update --force web` to rebalance the tasks across the service.
 ### Healthchecks
 
+## Chapter 11: Container Registries
+- Use Docker Hub's "Create Automated Build" feature to automatically build images from a GitHub repository. Something like a reverse webhook. 
+- Also, set rebuild triggers when dependencies are updated.
+- Speak it plainly, Docker Registry is an image storage service, while Docker Hub is a specific such service. From the Docker Hub page of Registry: "Distribution implementation for storing and distributing of container images and artifacts".
+- TLS, or Transport Layer Security, is a cryptographic protocol that provides security and data integrity for communications over networks such as the Internet. TLS is the successor to the Secure Sockets Layer (SSL), although the terms SSL and TLS are often used interchangeably. 
+- `docker container run -d -p 5000:5000 --name registry registry:2`: run a registry container. The registry container listens on port 5000 and is named `registry`.
+- `docker tag <image_name> localhost:5000/<image_name>`: tag an image with the registry's address. The image name is the name of the image. The registry's address is `localhost:5000`.
+- `docker pull localhost:5000/<image_name>`: pull an image from the registry. The registry's address is `localhost:5000`.
+- `docker push localhost:5000/<image_name>`: push an image to the registry. The registry's address is `localhost:5000`.
+- Once we push the image to the registry, we can safely remove it from the local machine with `docker image remove <image_name>`. We can still pull the image from the registry whenever we need it.
+- Since all the images are stored in volume, even if the registry is removed, running another container of registry with `-v $(pwd)/registry-data:/var/lib/registry` will bring back the images.
