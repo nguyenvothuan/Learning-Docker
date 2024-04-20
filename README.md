@@ -243,4 +243,7 @@ secrets:
 - `docker tag <image_name> localhost:5000/<image_name>`: tag the image with the registry's address.
 - `docker push localhost:5000/<image_name>`: push the image to the registry. 
 
-## Chapter 12: The What and Why of Kubernetes
+## Chapter 12: The What and Why of Kubernetes (K8s)
+- Kubernetes is a container orchestration platform that automates the deployment, scaling, and management of containerized applications. It was originally designed by Google and is now maintained by the Cloud Native Computing Foundation.
+- Compared to Swarm, Kubernetes is more complex and has more features. It's more suitable for large-scale applications that require high availability, scalability, and flexibility while Swarm is more suitable for small-scale applications that require simplicity and ease of use.
+- Vendor distributions of Kubernetes: Google Kubernetes Engine (GKE), Amazon Elastic Kubernetes Service (EKS), Azure Kubernetes Service (AKS), IBM Cloud Kubernetes Service, etc... Much more preferred in production.
