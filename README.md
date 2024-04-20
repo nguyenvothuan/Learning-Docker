@@ -235,3 +235,12 @@ secrets:
 - `docker push localhost:5000/<image_name>`: push an image to the registry. The registry's address is `localhost:5000`.
 - Once we push the image to the registry, we can safely remove it from the local machine with `docker image remove <image_name>`. We can still pull the image from the registry whenever we need it.
 - Since all the images are stored in volume, even if the registry is removed, running another container of registry with `-v $(pwd)/registry-data:/var/lib/registry` will bring back the images.
+### So, why Registry with Swarm
+- Imagine on one node, we have an interesting image that we want to build across the Swarm for `n` replicas and in another node. Holding the image locally wouldn't allow this to be possible, but we can create a registry service on the Swarm, push the image there, and create service with that image.
+- `docker service create --name registry --publish published=5000,target=5000 registry:2`: create a registry service on the Swarm. The registry service listens on port 5000 and is named `registry`.
+- On the current node, we can check repositories by `curl localhost:5000/v2/_catalog`. This will return a JSON object with the repositories in the registry.
+- `docker pull <iamge_name>` will pull the image from the registry service.
+- `docker tag <image_name> localhost:5000/<image_name>`: tag the image with the registry's address.
+- `docker push localhost:5000/<image_name>`: push the image to the registry. 
+
+## Chapter 12: The What and Why of Kubernetes
